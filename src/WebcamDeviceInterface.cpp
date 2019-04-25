@@ -32,15 +32,12 @@ int WebcamDeviceInterface::Cycle(oi::core::rgbd::RGBDDevice * streamer) {
     int res = 0;
     
     cv::Mat frame;
-    (*cap) >> frame;
-    if (this->withGUI) {
+    if (cap->read(frame)) {
+        res += streamer->QueueHDFrame(frame.data, frame_width(), frame_height(), TJPF_BGR, timestamp);
         cv::imshow("webcam", frame);
-        if (cv::waitKey(10) >= 0) {
-            // TODO handle gui keypresses?
-        }
-    };
+        if (this->withGUI && cv::waitKey(10) ) {};
+    }
     
-    res += streamer->QueueHDFrame(frame.data, frame_width(), frame_height(), TJPF_BGR, timestamp);
 
     return res;
 }
